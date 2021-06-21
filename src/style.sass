@@ -1,0 +1,342 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap')
+
+//這樣所有的虛擬元素 也直接套上border
+* , *:before, *:after
+  font-family: 'Playfair Display', '微軟正黑體'
+  // border: solid 1px black
+  //給所有元素都可定位
+  position: relative
+
+$colorBlueRoofLight: #6fc5ff
+$colorBlueRoofDark: #0058ff
+
+$colorGreyLight: #fafaf5
+$colorGreyNormal: #e3e2cf
+$colorGreyDark: #bebdaf
+$colorBackground: #2C2F36
+
+$colorShadowBlue: #7cb1ff
+$colorShadowBlueLight: #8dc9fc
+
+$colorWindowGrey: #534d4d
+
+$roofGradient: linear-gradient(150deg,$colorBlueRoofLight,$colorBlueRoofDark)
+
+// deep blue 2 , light blue2 
+$sceneGradient: linear-gradient(#1D2B49,#1A45A0,#91cdff,#fff)
+
+  
+@mixin size($w,$h:$w,$bdrs:0)
+  width: $w
+  height: $h
+  border-radius: $bdrs
+
+@mixin flex($j:center,$a:center)
+  display: flex
+  justify-content: $j
+  align-items: $a
+  
+@mixin abpos($l:initial,$t:initial)
+  position: absolute
+  left: $l
+  top: $t
+  
+html, body 
+  +size(100%) //填滿畫面
+  margin: 0
+  +flex
+  background-color: $colorBackground
+  //字會往上找 到這裡所以全部字都是白的
+  color: white
+
+.scene
+  +size(700px,500px,15px)
+  overflow: hidden
+  background: $sceneGradient
+  //要把白天晚上的顏色拉長
+  background-size: 100% 300%
+  
+  //      左右不偏移 上下 暈開
+  box-shadow: 0px 0px 30px rgba(black,0.3)
+  
+  .lefttopText
+    margin:
+      left: 30px
+      right: 30px
+    h1
+      font-size: 30px
+      letter-spacing: 3px
+      margin-top: 0
+      font-weight: 300
+    h5
+      font-size: 14px
+      letter-spacing: 1px
+      opacity: 0.6
+      margin-bottom: 0
+      font-weight: 300
+    p 
+      font-size: 14px
+      line-height: 24px
+      letter-spacing: 2px
+      opacity: 0.6
+    
+    .blueblock
+      +size(20px,25px)
+      background-color: $colorShadowBlue
+      
+  //定位在右下方
+.buliding  
+  position: absolute
+  right: 0
+  bottom: 0
+  //超出整個卡片高度 使用scale 縮放building
+  transform: scale(0.95)
+
+[class^="house"]
+  position: absolute
+  bottom: 0
+  right: 0
+    
+.house1
+  +size(180px,200px)
+  background-color: $colorGreyLight
+  // inset 代表內部陰影 左右 暈開
+  box-shadow: inset -50px 0px $colorGreyNormal
+  z-index: 1
+    
+  .window
+    //弧度給寬度的一半
+    +size(40px,100px,20px)
+    
+    background-color: $colorGreyNormal
+    box-shadow: inset 8px 5px $colorGreyDark
+    
+    //移動整個窗戶（注意嘖愛window內）
+    margin-top: 40px
+    margin-left: 70px
+    +flex
+    flex-direction: column
+
+    .circle
+      +size(20px,20px,50%)
+      background-color: $colorWindowGrey
+      margin: 4px
+      margin-left: 10px
+.house2
+  +size(240px,170px)
+  background-color: $colorGreyLight
+  right: 130px
+  // house2 疊了兩層不同陰影
+  box-shadow: inset 0px 15px $colorShadowBlueLight, inset -72px 0px $colorGreyNormal
+  z-index: 2
+  
+  .door
+    +size(40px,80px,20px 20px 0 0)
+    position: absolute
+    bottom: 0
+    left: 45px
+    background-color: $colorBackground
+    box-shadow: inset 10px 2px $colorShadowBlue
+  
+.house3
+  +size(320px,300px)
+  //所有元素擠到中間 然後要分配比例
+  +flex
+  //當house3上色 會蓋掉1,2的顏色 所以要排順序上色
+  background-color: $colorGreyLight
+  z-index:0
+  
+  .wall
+    flex:1
+    height: 100%
+    // row 中 , 對付軸線的開始
+    +flex(center, flex-start)
+    
+    .window
+      +size(24px,50px, 12px 12px 0 0)
+      margin-top: 30px
+      background-color: $colorBackground
+      
+      
+    //頭冠使用虛擬元素
+    &:before
+      content: ""
+      //block 才能調整虛擬元素寬高
+      display: block
+      // border: 1px solid #000
+      //預設是對左邊排列所以一直沒有突出
+      +size(105%,20px)
+      //要脫離上層的flex排版
+      position: absolute
+      top: -20px
+      left: 50%
+      transform: translateX(-50%)
+      background-color: inherit
+      box-shadow: 0px 0px 10px rgba(black,0.1)
+      
+    
+    // 以下是＠mixin wall 一樣的意思
+    // 加入color在mixin
+    // + window shadow顏色
+    // 頭冠順序
+    =wall($color,$flex, $windowPen:0, $z:1)
+      background-color: $color
+      flex:$flex
+      // //直接在這裡給頭冠
+      // &:before
+      //   background-color: $color
+      .window
+        box-shadow: inset $windowPen 2px $colorShadowBlue
+      &:before
+        z-index : $z
+      
+      
+    //第幾個小孩
+    &:nth-child(1)
+      +wall($colorGreyLight,10,8px)
+    
+    &:nth-child(2)
+      +wall($colorGreyNormal,14,0px, 2)
+    
+    &:nth-child(3)
+      +wall($colorGreyDark,10,-8px)
+
+  //思考原型 半徑的兩倍就是寬度 高度為一倍半徑
+=halfCir($r)
+  +size($r*2,$r,$r $r 0 0)
+    
+.roof
+  +halfCir(150px)
+  //因為flexbox 會跟walls擠在一起 用poa脫離控制
+  position: absolute
+  top: -170px
+  right: 5px
+  background: $roofGradient
+  
+  .rooftop
+    +halfCir(14px)
+    position: absolute
+    left: 50%
+    top: -14px
+    //回來自己一半寬度
+    transform: translateX(-50%)
+    background-color: #fff
+    
+  .cross
+    +size(4px,30px)
+    position: absolute
+    left: 50%
+    transform: translateX(-50%)
+    bottom: 10px
+    background-color: #fff
+    
+    //橫線使用虛擬元素 使用定位會參照cross ,他是在cross第一個元素
+    &:before
+      content: ""
+      display: block
+      +size(20px,4px)
+      position: absolute
+      left: 50%
+      transform: translateX(-50%)
+      //給cross高度一半 bottom 就會來到中間
+      bottom: 15px
+      background-color: #fff
+
+  //跟這張卡片做定位 所以希望跟這張卡一樣大
+.allstars
+  +size(100%)
+  position: absolute
+  left: 0
+  top: 0
+  
+  @keyframes falling
+    0%, 100%
+      opacity: 0
+    70%
+      opacity: 1
+    //在0%時位移
+    0%
+      transform: translate(100px, 0px)
+    100%
+      transform: translate(0px, 200px)
+    
+  
+  [class^='star']
+    +size(3px,3px,50%)
+    background-color: #fff
+    animation: falling 2s infinite
+  
+  @for $i from 1 through 30
+    .star#{$i}
+      // random() 0~1 
+      $posX: random()*100%
+      $posY: random()*-80%+60%
+      +abpos($posX,$posY)
+      //每個星間隔0.1s  -代表提早開始
+      animation-delay: $i*-0.1s
+        
+// remind
+.remind
+  opacity: 0.2
+  margin-bottom: 10px
+  letter-spacing: 1px
+  
+.dayText
+  display: none
+  
+.sun, .moon
+  +size(50px,50px,50%)
+  // background-color: white
+  +abpos(250px,100px)
+  
+.sun
+  background-color: #ffdd38
+  box-shadow: 0px 0px 20px rgba(#ffdd38,0.8)
+  top: 400px
+  opacity: 0
+
+.moon
+  //. 右10 上10
+  // box-shadow: inset 10px -10px rgba(white,0.9)
+  //both 抓前後影格做延伸
+  animation: moonAppear 2s both
+  
+@keyframes moonAppear
+  0%
+    box-shadow: inset 0px 0px rgba(white,0.9)
+  100%
+    box-shadow: inset 10px -10px rgba(white,0.9)
+  
+h1,h5,p,.moon,.scene,.allstars,.blueblock,.building,.sun
+  transition: 2s
+// .scene
+//   transition: 2s
+  
+input:checked+.scene
+  background-position: 0 100%
+  .nightText
+    display: none
+  .dayText
+    display: block
+  .allstars
+    opacity: 0
+  h1, h5, p
+    color: #222
+  .building
+    filter: brightness(105%)
+  //讓月亮上去
+  .moon
+    top: -100px
+    opacity: 0
+  .sun
+    top: 100px
+    opacity: 1
+  .blueblock
+    background-color: #fff
+    
+input
+  display: none
+  
+  
+    
+
